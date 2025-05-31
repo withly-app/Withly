@@ -15,43 +15,52 @@ public class AuthController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(AuthResultDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
-        try
+        var result = await mediator.Send(command);
+
+        if (result.IsSuccess)
         {
-            var token = await mediator.Send(command);
-            return Created(string.Empty, token);
+            return Created(string.Empty, result.Value);
         }
-        catch (UserAlreadyExistsException ex)
+
+        // Interpret known errors
+        return result.Error switch
         {
-            return Conflict(ex.Message);
-        }
-        catch (ValidationException ex)
-        {
-            var errors = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            return BadRequest(new ValidationProblemDetails(errors));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, "An unexpected error occurred.");
-        }
+            "User already exists" => Conflict(result.Error),
+            _ => BadRequest(new { error = result.Error })
+        };
     }
+
 
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
     {
-        var token = await mediator.Send(command);
-        return Ok(token);
+        var result = await mediator.Send(command);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return result.Error switch
+        {
+            "Invalid credentials" => Unauthorized(result.Error),
+            _ => BadRequest(new { error = result.Error })
+        };
     }
     
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand command)
     {
         var result = await mediator.Send(command);
-        return Ok(result);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
 }

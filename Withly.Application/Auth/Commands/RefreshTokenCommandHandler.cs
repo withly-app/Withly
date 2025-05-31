@@ -1,31 +1,34 @@
+using JetBrains.Annotations;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Auth.Dtos;
+using Withly.Application.Common;
 using Withly.Persistence;
 
 namespace Withly.Application.Auth.Commands;
 
+[UsedImplicitly]
 public class RefreshTokenHandler(
     AppDbContext dbContext,
     IAuthTokenGenerator authTokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator)
-    : IRequestHandler<RefreshTokenCommand, AuthResultDto>
+    : IRequestHandler<RefreshTokenCommand, Result<AuthResultDto>>
 {
-    public async Task<AuthResultDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResultDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var token = await dbContext.RefreshTokens
             .FirstOrDefaultAsync(t => t.Token == request.Token, cancellationToken);
 
         if (token == null || token.IsExpired || token.IsRevoked)
         {
-            throw new Exception("Invalid or expired refresh token");
+            return Result<AuthResultDto>.Fail("Invalid or expired refresh token");
         }
 
         var user = await dbContext.Users.FindAsync([token.UserId], cancellationToken);
         if (user == null)
         {
-            throw new Exception("User not found");
+            return Result<AuthResultDto>.Fail("User not found");
         }
         
         token.Revoke();
@@ -34,10 +37,10 @@ public class RefreshTokenHandler(
         dbContext.RefreshTokens.Add(newRefreshToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new AuthResultDto
+        return Result<AuthResultDto>.Success(new AuthResultDto
         {
             AccessToken = authTokenGenerator.Generate(user),
             RefreshToken = newRefreshToken.Token
-        };
+        });
     }
 }
