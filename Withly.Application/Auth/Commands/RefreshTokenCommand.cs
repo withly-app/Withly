@@ -3,4 +3,4 @@ using Withly.Application.Auth.Dtos;
 
 namespace Withly.Application.Auth.Commands;
 
-public record RegisterUserCommand(string Email, string Password) : IRequest<AuthResultDto>;
+public record RefreshTokenCommand(string Token) : IRequest<AuthResultDto>;

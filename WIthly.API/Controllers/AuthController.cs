@@ -20,7 +20,7 @@ public class AuthController(IMediator mediator) : ControllerBase
         try
         {
             var token = await mediator.Send(command);
-            return Created(string.Empty, new AuthResultDto { Token = token });
+            return Created(string.Empty, token);
         }
         catch (UserAlreadyExistsException ex)
         {
@@ -44,6 +44,14 @@ public class AuthController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
     {
         var token = await mediator.Send(command);
-        return Ok(new { token });
+        return Ok(token);
     }
+    
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand command)
+    {
+        var result = await mediator.Send(command);
+        return Ok(result);
+    }
+
 }
