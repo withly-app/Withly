@@ -2,8 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Withly.Application.Auth.Commands;
 using Withly.Application.Auth.Dtos;
-using Withly.Application.Auth.Exceptions;
-using FluentValidation;
 
 namespace Withly.API.Controllers;
 
@@ -33,8 +31,6 @@ public class AuthController(IMediator mediator) : ControllerBase
         };
     }
 
-
-
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
     {
@@ -63,4 +59,28 @@ public class AuthController(IMediator mediator) : ControllerBase
         return BadRequest(result.Error);
     }
 
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] RequestPasswordResetCommand command)
+    {
+        await mediator.Send(command);
+        return Ok(new
+        {
+            message =
+                "You have received a mail to reset your password if we found an account associated with your email."
+        });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+    {
+        var result = await mediator.Send(command);
+        if (result.IsSuccess)
+            return Ok(result.Value);
+
+        return result.Error switch
+        {
+            "User not found" => Problem("Invalid or expired password reset request"),
+            _ => BadRequest(new { error = result.Error })
+        };
+    }
 }

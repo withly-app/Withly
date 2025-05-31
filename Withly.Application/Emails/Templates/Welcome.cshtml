@@ -1,0 +1,50 @@
+﻿@model Withly.Application.Emails.Templates.WelcomeEmail
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>@Model.Subject</title>
+    <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .footer {
+      font-size: 0.9em;
+      color: #888;
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+    <h2>Hello @Model.Username,</h2>
+    <p>Thanks for signing up for <strong>Withly</strong>! We’re thrilled to have you on board.</p>
+    <p>If you have any questions, just <a href="mailto:support@withly.com">email our team</a>.</p>
+    <p class="footer">— The Withly Team</p>
+</div>
+</body>
+</html>

@@ -14,6 +14,8 @@ using Withly.Application.Auth.Validators;
 using Withly.Application.Common.Behaviors;
 using Withly.Application.Common.Interfaces;
 using Withly.Infrastructure.Auth;
+using Withly.Infrastructure.Email;
+using Withly.Infrastructure.Models.Email;
 using Withly.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +27,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Host.UseSerilog();
-        
+builder.Configuration.AddUserSecrets<Program>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions => npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name)));
@@ -50,6 +52,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<IMediatorMarker>());
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddSingleton<IEmailTemplateRenderer, RazorTemplateRenderer>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
         
 builder.Services.AddAppHealthChecks();
 
@@ -57,6 +61,7 @@ builder.Services.AddControllers();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetRequiredSection("Jwt"));
 var jwtSettings = builder.Configuration.GetRequiredSection("Jwt").Get<JwtSettings>()!;
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetRequiredSection("Smtp"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

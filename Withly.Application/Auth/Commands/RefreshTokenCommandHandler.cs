@@ -15,17 +15,17 @@ public class RefreshTokenHandler(
     IRefreshTokenGenerator refreshTokenGenerator)
     : IRequestHandler<RefreshTokenCommand, Result<AuthResultDto>>
 {
-    public async Task<Result<AuthResultDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResultDto>> Handle(RefreshTokenCommand request, CancellationToken ct)
     {
         var token = await dbContext.RefreshTokens
-            .FirstOrDefaultAsync(t => t.Token == request.Token, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Token == request.Token, ct);
 
         if (token == null || token.IsExpired || token.IsRevoked)
         {
             return Result<AuthResultDto>.Fail("Invalid or expired refresh token");
         }
 
-        var user = await dbContext.Users.FindAsync([token.UserId], cancellationToken);
+        var user = await dbContext.Users.FindAsync([token.UserId], ct);
         if (user == null)
         {
             return Result<AuthResultDto>.Fail("User not found");
@@ -35,7 +35,7 @@ public class RefreshTokenHandler(
         var newRefreshToken = refreshTokenGenerator.Generate(user.Id);
 
         dbContext.RefreshTokens.Add(newRefreshToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
         {
