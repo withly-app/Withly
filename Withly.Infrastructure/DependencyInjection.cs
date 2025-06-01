@@ -10,6 +10,7 @@ using Withly.Application.Common.Interfaces;
 using Withly.Application.Emails.Interfaces;
 using Withly.Domain.Repositories;
 using Withly.Infrastructure.Auth;
+using Withly.Infrastructure.Auth.Repositories;
 using Withly.Infrastructure.Common.Services;
 using Withly.Infrastructure.Email;
 using Withly.Infrastructure.Events;
@@ -43,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthTokenGenerator, JwtAuthTokenGenerator>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IEventRepository, EventRepository>();
         

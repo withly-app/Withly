@@ -1,0 +1,27 @@
+﻿@model Withly.Application.Emails.Templates.EventInviteEmail
+
+<p>Hi @Model.DisplayName,</p>
+
+<p>
+    You’ve been invited to <strong>@Model.EventTitle</strong>
+    on <strong>@Model.StartUtc.ToString("yyyy-MM-dd HH:mm")</strong> UTC.
+</p>
+
+<p>Please RSVP:</p>
+<ul>
+    <li>
+        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=yes")">
+            Yes
+        </a>
+    </li>
+    <li>
+        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=maybe")">
+            Maybe
+        </a>
+    </li>
+    <li>
+        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=no")">
+            No
+        </a>
+    </li>
+</ul>
