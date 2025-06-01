@@ -12,10 +12,10 @@ using Withly.Domain.Repositories;
 using Withly.Infrastructure.Auth;
 using Withly.Infrastructure.Common.Services;
 using Withly.Infrastructure.Email;
+using Withly.Infrastructure.Events;
 using Withly.Infrastructure.Models.Email;
 using Withly.Infrastructure.UserProfiles;
 using Withly.Persistence;
-using CurrentUserService = Withly.Infrastructure.Auth.CurrentUserService;
 
 namespace Withly.Infrastructure;
 
@@ -40,9 +40,11 @@ public static class DependencyInjection
         
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthTokenGenerator, JwtAuthTokenGenerator>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
         
         services.Configure<SmtpSettings>(configuration.GetRequiredSection("Smtp"));
         services.AddSingleton<IEmailTemplateRenderer, RazorTemplateRenderer>();

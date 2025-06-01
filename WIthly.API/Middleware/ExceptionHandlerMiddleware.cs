@@ -16,7 +16,6 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
         }
         catch (ValidationException ex)
         {
-            logger.LogWarning(ex, "Validation failed");
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             context.Response.ContentType = "application/json";
 

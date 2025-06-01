@@ -20,14 +20,7 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
             .ToList();
 
         if (failures.Count == 0) return await next(cancellationToken);
-        var errors = failures
-            .GroupBy(e => e.PropertyName)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(e => e.ErrorMessage).ToArray()
-            );
 
         throw new ValidationException("Validation failed", failures);
-
     }
 }

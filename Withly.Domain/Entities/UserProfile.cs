@@ -4,8 +4,8 @@ namespace Withly.Domain.Entities;
 
 public class UserProfile
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
     [MaxLength(50)]
-    public string DisplayName { get; set; }
-    public string AvatarUrl { get; set; }
+    public required string DisplayName { get; set; }
+    public required string AvatarUrl { get; set; }
 }

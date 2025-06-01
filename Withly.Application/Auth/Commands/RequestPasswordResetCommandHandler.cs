@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Withly.Application.Common;
-using Withly.Application.Common.Interfaces;
 using Withly.Application.Emails.Interfaces;
 using Withly.Application.Emails.Templates;
 using Withly.Domain.Repositories;

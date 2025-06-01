@@ -11,15 +11,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 {
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<Event> Events => Set<Event>();
+    public DbSet<Invitee> Invitees => Set<Invitee>();
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
-        builder.Entity<UserProfile>()
+        modelBuilder.Entity<UserProfile>()
             .HasOne<ApplicationUser>()
             .WithOne()
             .HasForeignKey<UserProfile>(p => p.Id)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Event>()
+            .HasMany(e => e.Invitees)
+            .WithOne(i => i.Event)
+            .HasForeignKey(i => i.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

@@ -2,7 +2,6 @@ using JetBrains.Annotations;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Withly.Application.Auth.Dtos;
-using Withly.Application.Auth.Exceptions;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common;
 using Withly.Application.Common.Interfaces;
@@ -19,9 +18,10 @@ public class RegisterUserHandler(
     UserManager<ApplicationUser> userManager,
     IAuthTokenGenerator tokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
-    AppDbContext dbContext,
+    IUnitOfWork unitOfWork,
     IBackgroundEmailQueue emailQueue,
-    IUserProfileRepository userProfileRepository)
+    IUserProfileRepository userProfileRepository,
+    IRefreshTokenRepository refreshTokenRepository)
     : IRequestHandler<RegisterUserCommand, Result<AuthResultDto>>
 {
     public async Task<Result<AuthResultDto>> Handle(RegisterUserCommand request, CancellationToken ct)
@@ -47,8 +47,8 @@ public class RegisterUserHandler(
         
         var refreshToken = refreshTokenGenerator.Generate(user.Id); 
 
-        dbContext.RefreshTokens.Add(refreshToken);
-        await dbContext.SaveChangesAsync(ct);
+        await refreshTokenRepository.AddAsync(refreshToken, ct);
+        await unitOfWork.SaveChangesAsync(ct);
 
         emailQueue.QueueEmail(new WelcomeEmail
         {

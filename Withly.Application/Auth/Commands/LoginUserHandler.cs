@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Withly.Application.Auth.Dtos;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common;
-using Withly.Infrastructure.Auth;
+using Withly.Application.Common.Interfaces;
 using Withly.Persistence;
 
 namespace Withly.Application.Auth.Commands;
@@ -15,7 +15,8 @@ public class LoginUserHandler(
     UserManager<ApplicationUser> userManager,
     IAuthTokenGenerator tokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
-    AppDbContext dbContext)
+    IRefreshTokenRepository refreshTokenRepository,
+    IUnitOfWork unitOfWork)
     : IRequestHandler<LoginUserCommand, Result<AuthResultDto>>
 {
     public async Task<Result<AuthResultDto>> Handle(LoginUserCommand request, CancellationToken ct)
@@ -28,8 +29,8 @@ public class LoginUserHandler(
 
         var refreshToken = refreshTokenGenerator.Generate(user.Id); 
 
-        dbContext.RefreshTokens.Add(refreshToken);
-        await dbContext.SaveChangesAsync(ct);
+        await refreshTokenRepository.AddAsync(refreshToken, ct);
+        await unitOfWork.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
         {

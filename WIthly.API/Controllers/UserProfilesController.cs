@@ -9,7 +9,7 @@ namespace Withly.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class UserProfileController(IMediator mediator) : Controller
+public class UserProfilesController(IMediator mediator) : Controller
 {
     [HttpGet("{userId:guid}")]
     public async Task<IActionResult> GetById(Guid userId)
