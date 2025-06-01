@@ -19,7 +19,7 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
             .Where(f => f != null)
             .ToList();
 
-        if (!failures.Any()) return await next(cancellationToken);
+        if (failures.Count == 0) return await next(cancellationToken);
         var errors = failures
             .GroupBy(e => e.PropertyName)
             .ToDictionary(

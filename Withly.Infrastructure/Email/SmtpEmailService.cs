@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Withly.Application.Common.Interfaces;
+using Withly.Application.Emails.Interfaces;
 using Withly.Infrastructure.Models.Email;
 
 namespace Withly.Infrastructure.Email;

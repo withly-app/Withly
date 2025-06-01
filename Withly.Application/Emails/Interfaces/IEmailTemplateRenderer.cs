@@ -1,4 +1,4 @@
-﻿namespace Withly.Application.Common.Interfaces;
+﻿namespace Withly.Application.Emails.Interfaces;
 
 public interface IEmailTemplateRenderer
 {

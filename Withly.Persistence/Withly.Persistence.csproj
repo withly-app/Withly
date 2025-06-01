@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Withly.Domain\Withly.Domain.csproj" />
       <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
     </ItemGroup>
 

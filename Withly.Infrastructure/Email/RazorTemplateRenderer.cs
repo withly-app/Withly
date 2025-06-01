@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RazorLight;
 using Withly.Application.Common.Interfaces;
+using Withly.Application.Emails.Interfaces;
 using Withly.Application.Emails.Templates;
 
 namespace Withly.Infrastructure.Email;

@@ -6,7 +6,10 @@ using Withly.Application.Auth.Exceptions;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common;
 using Withly.Application.Common.Interfaces;
+using Withly.Application.Emails.Interfaces;
 using Withly.Application.Emails.Templates;
+using Withly.Domain.Entities;
+using Withly.Domain.Repositories;
 using Withly.Persistence;
 
 namespace Withly.Application.Auth.Commands;
@@ -17,7 +20,8 @@ public class RegisterUserHandler(
     IAuthTokenGenerator tokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
     AppDbContext dbContext,
-    IEmailService emailService)
+    IBackgroundEmailQueue emailQueue,
+    IUserProfileRepository userProfileRepository)
     : IRequestHandler<RegisterUserCommand, Result<AuthResultDto>>
 {
     public async Task<Result<AuthResultDto>> Handle(RegisterUserCommand request, CancellationToken ct)
@@ -33,16 +37,24 @@ public class RegisterUserHandler(
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return Result<AuthResultDto>.Fail($"Registration failed: {errors}");
         }
+
+        await userProfileRepository.AddAsync(new UserProfile
+        {
+            Id = user.Id,
+            AvatarUrl = "TheLastAirbender",
+            DisplayName = request.DisplayName,
+        }, ct);
+        
         var refreshToken = refreshTokenGenerator.Generate(user.Id); 
 
         dbContext.RefreshTokens.Add(refreshToken);
         await dbContext.SaveChangesAsync(ct);
 
-        _ = emailService.SendAsync(new WelcomeEmail()
+        emailQueue.QueueEmail(new WelcomeEmail
         {
             To = user.Email,
-            Username = user.Email
-        }, ct);
+            DisplayName = request.DisplayName
+        });
         
         return Result<AuthResultDto>.Success(new AuthResultDto
         {

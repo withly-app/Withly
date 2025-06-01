@@ -74,13 +74,8 @@ public class AuthController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         var result = await mediator.Send(command);
-        if (result.IsSuccess)
-            return Ok(result.Value);
-
-        return result.Error switch
-        {
-            "User not found" => Problem("Invalid or expired password reset request"),
-            _ => BadRequest(new { error = result.Error })
-        };
+        return result.IsSuccess 
+            ? Ok(result.Value) 
+            : BadRequest("Invalid or expired password reset request");
     }
 }
