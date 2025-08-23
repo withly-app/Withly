@@ -1,20 +1,19 @@
 ﻿using System.Security.Claims;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Withly.Application.UserProfiles.Queries;
+using Withly.Application.Services;
 
 namespace Withly.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class UserProfilesController(IMediator mediator) : Controller
+public class UserProfilesController(UserService userService) : Controller
 {
     [HttpGet("{userId:guid}")]
-    public async Task<IActionResult> GetById(Guid userId)
+    public async Task<IActionResult> GetById(Guid userId, CancellationToken ct = default)
     {
-        var profile = await mediator.Send(new GetUserProfileQuery(userId));
+        var profile = await userService.GetUserByIdAsync(userId, ct);
         if (profile is null) 
             return NotFound();
         
@@ -22,14 +21,14 @@ public class UserProfilesController(IMediator mediator) : Controller
     }
     
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUserProfile()
+    public async Task<IActionResult> GetCurrentUserProfile(CancellationToken ct = default)
     {
         var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (!Guid.TryParse(userIdStr, out var userId))
             return Unauthorized();
 
-        var profile = await mediator.Send(new GetUserProfileQuery(userId));
+        var profile = await userService.GetUserByIdAsync(userId, ct);
         if (profile is null)
             return NotFound();
 

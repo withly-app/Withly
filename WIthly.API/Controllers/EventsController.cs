@@ -1,20 +1,19 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Withly.Application.Events.Commands;
-using Withly.Application.Events.Queries;
+using Withly.Application.Services;
 
 namespace Withly.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class EventsController(IMediator mediator) : ControllerBase
+public class EventsController(EventService eventService) : ControllerBase
 {
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
-        var result = await mediator.Send(new GetEventByIdQuery(id));
+        var result = await eventService.GetByIdAsync(id, ct);
         if (result is null)
             return NotFound();
 
@@ -22,9 +21,9 @@ public class EventsController(IMediator mediator) : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateEventCommand command)
+    public async Task<IActionResult> Create(CreateEventObject @object, CancellationToken ct = default)
     {
-        var id = await mediator.Send(command);
+        var id = await eventService.CreateEventAsync(@object, ct);
         return CreatedAtAction(nameof(GetById), new { id }, id);
     }
 

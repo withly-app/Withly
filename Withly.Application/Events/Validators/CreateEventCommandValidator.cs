@@ -5,7 +5,7 @@ using Withly.Application.Events.Commands;
 namespace Withly.Application.Events.Validators;
 
 [UsedImplicitly]
-public class CreateEventCommandValidator : AbstractValidator<CreateEventCommand>
+public class CreateEventCommandValidator : AbstractValidator<CreateEventObject>
 {
     public CreateEventCommandValidator()
     {

@@ -1,26 +1,21 @@
-using JetBrains.Annotations;
-using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Withly.Application.Auth.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
 using Withly.Application.Auth.Dtos;
+using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common;
 using Withly.Application.Common.Interfaces;
 using Withly.Persistence;
 
-namespace Withly.Application.Auth.Commands;
+namespace Withly.Application.Services;
 
-[UsedImplicitly]
-public class RefreshTokenHandler(
-    UserManager<ApplicationUser> userManager,
+public class RefreshTokenService(UserManager<ApplicationUser> userManager,
     IUnitOfWork unitOfWork,
     IAuthTokenGenerator authTokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
     IRefreshTokenRepository refreshTokenRepository)
-    : IRequestHandler<RefreshTokenCommand, Result<AuthResultDto>>
 {
-    public async Task<Result<AuthResultDto>> Handle(RefreshTokenCommand request, CancellationToken ct)
+    public async Task<Result<AuthResultDto>> GetAuthTokenAsync(string refreshToken, CancellationToken ct)
     {
-        var token = await refreshTokenRepository.GetByTokenAsync(request.Token, ct);
+        var token = await refreshTokenRepository.GetByTokenAsync(refreshToken, ct);
 
         if (token == null || token.IsExpired || token.IsRevoked)
         {

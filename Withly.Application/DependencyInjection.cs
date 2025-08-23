@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
-using MediatR;
 using Withly.Application.Common.Behaviors;
+using Withly.Application.Services;
 
 namespace Withly.Application;
 
@@ -11,12 +11,12 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssembly(assembly);
-        });
+
+        services.AddScoped<UserService>();
+        services.AddScoped<EventService>();
+        services.AddScoped<RefreshTokenService>();
+        services.AddScoped(typeof(RequestValidator<>));
         services.AddValidatorsFromAssembly(assembly);
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         
         return services;
     }

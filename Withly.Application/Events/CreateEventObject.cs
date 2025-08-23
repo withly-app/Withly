@@ -1,8 +1,6 @@
-﻿using MediatR;
+﻿namespace Withly.Application.Events.Commands;
 
-namespace Withly.Application.Events.Commands;
-
-public record CreateEventCommand(
+public record CreateEventObject(
     string Title,
     string Description,
     DateTime StartUtc,
@@ -10,4 +8,4 @@ public record CreateEventCommand(
     bool IsRecurring,
     string? RecurringRule,
     bool IsPublic,
-    List<string> InviteeEmails) : IRequest<Guid>;
+    List<string> InviteeEmails);

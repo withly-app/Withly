@@ -1,11 +1,11 @@
 using FluentValidation;
-using Withly.Application.Auth.Commands;
+using Withly.Application.Auth.Dtos;
 
 namespace Withly.Application.Auth.Validators;
 
-public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
 {
-    public RegisterUserCommandValidator()
+    public RegisterUserDtoValidator()
     {
         RuleFor(command => command.Email)
             .NotEmpty().WithMessage("Email is required.")

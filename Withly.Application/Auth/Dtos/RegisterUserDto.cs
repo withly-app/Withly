@@ -1,11 +1,6 @@
-using MediatR;
-using Swashbuckle.AspNetCore.Annotations;
-using Withly.Application.Auth.Dtos;
-using Withly.Application.Common;
+namespace Withly.Application.Auth.Dtos;
 
-namespace Withly.Application.Auth.Commands;
-
-public class RegisterUserCommand : IRequest<Result<AuthResultDto>>
+public class RegisterUserDto
 {
     /// <summary>
     /// E-mail address

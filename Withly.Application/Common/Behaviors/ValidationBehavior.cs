@@ -1,16 +1,14 @@
 using FluentValidation;
-using MediatR;
 
 namespace Withly.Application.Common.Behaviors;
 
-public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
-    : IPipelineBehavior<TRequest, TResponse>
+public class RequestValidator<TRequest>(IEnumerable<IValidator<TRequest>> validators)
     where TRequest : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task Handle(TRequest request, CancellationToken cancellationToken)
     {
         if (!validators.Any())
-            return await next(cancellationToken);
+            return;
 
         var context = new ValidationContext<TRequest>(request);
 
@@ -19,7 +17,7 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
             .Where(f => f != null)
             .ToList();
 
-        if (failures.Count == 0) return await next(cancellationToken);
+        if (failures.Count == 0) return;
 
         throw new ValidationException("Validation failed", failures);
     }
