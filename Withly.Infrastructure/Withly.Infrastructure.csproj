@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-      <ProjectReference Include="..\Withly.Application\Withly.Application.csproj" />
-      <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="MailKit" Version="4.12.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
-      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.11.0" />
-      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.11.0" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Withly.Application\Withly.Application.csproj" />
+    <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+  </ItemGroup>
 </Project>

@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Withly.Domain\Withly.Domain.csproj" />
-      <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Withly.Domain\Withly.Domain.csproj" />
+    <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
+  </ItemGroup>
 </Project>
