@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/API/">
+    <Project Path="Withly.API/Withly.API.csproj" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="Withly.Application/Withly.Application.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Withly.Domain/Withly.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Withly.Infrastructure.Models/Withly.Infrastructure.Models.csproj" />
+    <Project Path="Withly.Infrastructure/Withly.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Persistence/">
+    <Project Path="Withly.Persistence/Withly.Persistence.csproj" />
+  </Folder>
+</Solution>
