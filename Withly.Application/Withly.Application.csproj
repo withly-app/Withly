@@ -1,12 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <PreserveCompilationContext>true</PreserveCompilationContext>
-    </PropertyGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\Withly.Persistence\Withly.Persistence.csproj" />
     </ItemGroup>
@@ -18,6 +10,7 @@
       <PackageReference Include="MediatR" Version="12.5.0" />
       <PackageReference Include="RazorLight" Version="2.3.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>
