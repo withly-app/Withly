@@ -2,5 +2,5 @@
 
 public interface IBackgroundEmailQueue
 {
-    void QueueEmail<T>(T email) where T : IEmailTemplate;
+    void QueueEmail<T>(T email, Guid? userId) where T : IEmailTemplate;
 }

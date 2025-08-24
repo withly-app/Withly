@@ -8,8 +8,9 @@ public class BackgroundEmailQueue(ILogger<BackgroundEmailQueue> logger) : IBackg
 {
     private readonly Channel<IEmailTemplate> _queue = Channel.CreateUnbounded<IEmailTemplate>();
     public ChannelReader<IEmailTemplate> Reader => _queue.Reader;
-    public void QueueEmail<T>(T email) where T : IEmailTemplate
+    public void QueueEmail<T>(T email, Guid? userId) where T : IEmailTemplate
     {
+        email.UserId = userId;
         if (!_queue.Writer.TryWrite(email))
         {
             logger.LogError("Could not write email to queue");

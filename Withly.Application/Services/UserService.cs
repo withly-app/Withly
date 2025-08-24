@@ -54,7 +54,7 @@ public class UserService(
         {
             To = user.Email,
             DisplayName = dto.DisplayName
-        });
+        }, user.Id);
         
         return Result<AuthResultDto>.Success(new AuthResultDto
         {
@@ -97,7 +97,7 @@ public class UserService(
             To = user.Email!,
             Username = userProfile!.DisplayName,
             ResetLink = resetLink
-        });
+        }, user.Id);
     }
     
     public async Task<Result<AuthResultDto>> ResetPasswordAsync(string email, string token, string newPassword, CancellationToken ct)

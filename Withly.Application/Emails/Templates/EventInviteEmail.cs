@@ -1,10 +1,13 @@
-﻿using Withly.Infrastructure.Models.Email.Interfaces;
+﻿using Withly.Infrastructure.Models.Email;
+using Withly.Infrastructure.Models.Email.Interfaces;
 
 namespace Withly.Application.Emails.Templates;
 
 public class EventInviteEmail : IEmailTemplate
 {
     public required string To { get; init; }
+    public Guid? UserId { get; set; }
+    public List<EmailAttachment> Attachments { get; set; } = [];
     public string Subject => $"Are you coming along to {EventTitle}";
     public required string DisplayName { get; init; }
     public required string EventTitle { get; init; }

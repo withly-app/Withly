@@ -1,6 +1,4 @@
-﻿using Withly.Domain.Enums;
-
-namespace Withly.Domain.Entities;
+﻿namespace Withly.Domain.Entities;
 
 public class Event
 {

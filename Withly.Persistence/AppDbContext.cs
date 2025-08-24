@@ -36,6 +36,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(e => e.UserId);
+        
+        modelBuilder.Entity<EmailMessage>()
+            .HasMany(e => e.Attachments)
+            .WithOne(a => a.Email)
+            .HasForeignKey(a => a.EmailId)
+            .OnDelete(DeleteBehavior.Cascade);
 
     }
 }

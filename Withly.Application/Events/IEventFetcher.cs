@@ -1,6 +1,6 @@
 ﻿using Withly.Application.Events.Dtos;
 
-namespace Withly.Application.Services;
+namespace Withly.Application.Events;
 
 public interface IEventFetcher
 {

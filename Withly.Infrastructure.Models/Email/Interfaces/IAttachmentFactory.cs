@@ -1,7 +1,6 @@
 ﻿using Withly.Domain.Entities;
-using Withly.Infrastructure.Models.Email;
 
-namespace Withly.Infrastructure.Email;
+namespace Withly.Infrastructure.Models.Email.Interfaces;
 
 public interface IAttachmentFactory
 {

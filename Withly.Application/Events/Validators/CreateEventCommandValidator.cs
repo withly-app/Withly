@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using JetBrains.Annotations;
-using Withly.Application.Events.Commands;
+using Withly.Application.Events.Dtos;
 
 namespace Withly.Application.Events.Validators;
 
 [UsedImplicitly]
-public class CreateEventCommandValidator : AbstractValidator<CreateEventObject>
+public class CreateEventCommandValidator : AbstractValidator<CreateEventDto>
 {
     public CreateEventCommandValidator()
     {

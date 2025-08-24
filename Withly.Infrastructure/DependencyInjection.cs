@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<IAttachmentFactory, AttachmentFactory>();
         
         services.Configure<SmtpSettings>(configuration.GetRequiredSection("Smtp"));
         services.AddSingleton<IEmailTemplateRenderer, RazorTemplateRenderer>();

@@ -5,11 +5,13 @@ public class EmailMessage
 {
     public Guid Id { get; set; }
     public Guid? UserId { get; set; }
-    public List<string> Recipients { get; set; }
-    public string Subject { get; set; }
-    public string Body { get; set; }
+    public List<string> Recipients { get; init; }
+    public string Subject { get; init; }
+    public string Body { get; init; }
+
+    public List<EmailAttachment> Attachments { get; init; } = [];
     
-    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedUtc { get; init; } = DateTime.UtcNow;
     public int RetryCount { get; set; }
     public EmailStatus Status { get; set; } = EmailStatus.Queued;
     public DateTime SentUtc { get; set; }
@@ -19,6 +21,7 @@ public class EmailMessage
     public EmailMessage(IEmailTemplate template, string body)
     {
         Id = Guid.NewGuid();
+        UserId = template.UserId;
         Recipients = [template.To];
         Subject = template.Subject;
         Body = body;

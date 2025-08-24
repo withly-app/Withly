@@ -5,6 +5,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Ical.Net" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="RazorLight" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" />
