@@ -1,6 +1,6 @@
 ﻿namespace Withly.Application.Events.Commands;
 
-public record CreateEventObject(
+public record CreateEventDto(
     string Title,
     string Description,
     DateTime StartUtc,

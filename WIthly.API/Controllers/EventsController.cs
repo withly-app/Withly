@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Withly.Application.Events.Commands;
-using Withly.Application.Services;
+using Withly.Application.Events;
+using Withly.Application.Events.Dtos;
 
 namespace Withly.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class EventsController(EventService eventService) : ControllerBase
+public class EventsController(IEventFetcher eventFetcher, IEventCreator eventCreator) : ControllerBase
 {
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
-        var result = await eventService.GetByIdAsync(id, ct);
+        var result = await eventFetcher.GetByIdAsync(id, ct);
         if (result is null)
             return NotFound();
 
@@ -21,9 +21,9 @@ public class EventsController(EventService eventService) : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> Create(CreateEventObject @object, CancellationToken ct = default)
+    public async Task<IActionResult> Create(CreateEventDto dto, CancellationToken ct = default)
     {
-        var id = await eventService.CreateEventAsync(@object, ct);
+        var id = await eventCreator.CreateEventAsync(dto, ct);
         return CreatedAtAction(nameof(GetById), new { id }, id);
     }
 
