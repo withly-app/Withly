@@ -31,7 +31,8 @@ public class SmtpEmailService(
         message.Body = new TextPart("html") { Text = emailModel.Body };
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTlsWhenAvailable, ct);
+        client.CheckCertificateRevocation = false;
+        await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls, ct);
         await client.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password, ct);
 
         try
