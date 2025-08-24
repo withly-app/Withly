@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Withly.Application.Common.Interfaces;
-using Withly.Application.Emails.Interfaces;
 using Withly.Infrastructure.Models.Email;
+using Withly.Infrastructure.Models.Email.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
@@ -16,17 +16,19 @@ public class SmtpEmailService(
 {
     private readonly SmtpSettings _smtpSettings = smtpSettingsOptions.Value;
 
-    public async Task SendAsync<T>(T emailModel, CancellationToken ct = default) where T : IEmailTemplate
+    public async Task SendAsync(EmailMessage emailModel, CancellationToken ct = default)
     {
-        var html = await renderer.RenderAsync(emailModel);
-        if (html is null)
-            return;
-
         var message = new MimeMessage();
         message.From.Add(MailboxAddress.Parse("noreply@withly.app"));
-        message.To.Add(MailboxAddress.Parse(emailModel.To));
+        foreach (var recipient in emailModel.Recipients)
+        {
+            if (MailboxAddress.TryParse(recipient, out var mailboxAddress))
+            {
+                message.To.Add(mailboxAddress);
+            }
+        }
         message.Subject = emailModel.Subject;
-        message.Body = new TextPart("html") { Text = html };
+        message.Body = new TextPart("html") { Text = emailModel.Body };
 
         using var client = new SmtpClient();
         await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTlsWhenAvailable, ct);

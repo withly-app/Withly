@@ -4,11 +4,11 @@ using Withly.Application.Auth.Dtos;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common;
 using Withly.Application.Common.Interfaces;
-using Withly.Application.Emails.Interfaces;
 using Withly.Application.Emails.Templates;
 using Withly.Application.UserProfiles.Dtos;
 using Withly.Domain.Entities;
 using Withly.Domain.Repositories;
+using Withly.Infrastructure.Models.Email.Interfaces;
 using Withly.Persistence;
 
 namespace Withly.Application.Services;

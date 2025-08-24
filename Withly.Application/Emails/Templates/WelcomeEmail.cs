@@ -1,5 +1,4 @@
-﻿using Withly.Application.Common.Interfaces;
-using Withly.Application.Emails.Interfaces;
+﻿using Withly.Infrastructure.Models.Email.Interfaces;
 
 namespace Withly.Application.Emails.Templates;
 

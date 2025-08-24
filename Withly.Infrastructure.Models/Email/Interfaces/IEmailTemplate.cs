@@ -1,4 +1,4 @@
-﻿namespace Withly.Application.Emails.Interfaces;
+﻿namespace Withly.Infrastructure.Models.Email.Interfaces;
 
 public interface IEmailTemplate
 {

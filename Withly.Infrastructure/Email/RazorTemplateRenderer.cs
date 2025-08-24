@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RazorLight;
-using Withly.Application.Common.Interfaces;
-using Withly.Application.Emails.Interfaces;
 using Withly.Application.Emails.Templates;
+using Withly.Infrastructure.Models.Email.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
@@ -13,16 +12,8 @@ public class RazorTemplateRenderer(ILogger<RazorTemplateRenderer> logger) : IEma
         .UseMemoryCachingProvider()
         .Build();
 
-    public async Task<string?> RenderAsync<T>(T model) where T : IEmailTemplate
+    public async Task<string> RenderAsync<T>(T model) where T : IEmailTemplate
     {
-        try
-        {
-            return await _engine.CompileRenderAsync(model.TemplateName, model);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while rendering template");
-        }
-        return null;
+        return await _engine.CompileRenderAsync(model.TemplateName, model);
     }
 }

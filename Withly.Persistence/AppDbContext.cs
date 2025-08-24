@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Withly.Domain.Entities;
 using Withly.Infrastructure.Auth;
+using Withly.Infrastructure.Models.Email;
 
 namespace Withly.Persistence;
 
@@ -13,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<Event> Events => Set<Event>();
     public DbSet<Invitee> Invitees => Set<Invitee>();
+    public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +31,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .WithOne(i => i.Event)
             .HasForeignKey(i => i.EventId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EmailMessage>()
+            .HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(e => e.UserId);
 
     }
 }

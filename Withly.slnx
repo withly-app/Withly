@@ -8,6 +8,9 @@
   <Folder Name="/Domain/">
     <Project Path="Withly.Domain/Withly.Domain.csproj" />
   </Folder>
+  <Folder Name="/Hosts/">
+    <Project Path="Withly.AppHost\Withly.AppHost.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="Withly.Infrastructure.Models/Withly.Infrastructure.Models.csproj" />
     <Project Path="Withly.Infrastructure/Withly.Infrastructure.csproj" />

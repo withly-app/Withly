@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Withly.Application.Auth.Interfaces;
 using Withly.Application.Common.Interfaces;
-using Withly.Application.Emails.Interfaces;
 using Withly.Domain.Repositories;
 using Withly.Infrastructure.Auth;
 using Withly.Infrastructure.Auth.Repositories;
@@ -15,6 +14,7 @@ using Withly.Infrastructure.Common.Services;
 using Withly.Infrastructure.Email;
 using Withly.Infrastructure.Events;
 using Withly.Infrastructure.Models.Email;
+using Withly.Infrastructure.Models.Email.Interfaces;
 using Withly.Infrastructure.UserProfiles;
 using Withly.Persistence;
 
@@ -26,7 +26,11 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                npgsqlOptions => npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name)));
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null);
+                    npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);
+                }));
         
         services.AddIdentityCore<ApplicationUser>(options =>
             {
@@ -52,7 +56,9 @@ public static class DependencyInjection
         services.AddSingleton<IEmailTemplateRenderer, RazorTemplateRenderer>();
         services.AddScoped<IEmailService, SmtpEmailService>();
         services.AddSingleton<IBackgroundEmailQueue, BackgroundEmailQueue>();
+        services.AddScoped<EmailMessageRepository>();
         services.AddHostedService<EmailBackgroundWorker>();
+        services.AddHostedService<EmailDispatchWorker>();
 
         services.AddHostedService<DbMigrationService>();
         
