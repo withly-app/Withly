@@ -1,12 +1,8 @@
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Withly.API.Extensions;
 using Withly.API.Middleware;
 using Withly.Application;
 using Withly.Infrastructure;
-using Withly.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

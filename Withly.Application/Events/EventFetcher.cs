@@ -1,5 +1,4 @@
-﻿using Withly.Application.Common.Interfaces;
-using Withly.Application.Events.Dtos;
+﻿using Withly.Application.Events.Dtos;
 using Withly.Domain.Repositories;
 
 namespace Withly.Application.Events;

@@ -3,7 +3,6 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Withly.Application.Common.Interfaces;
 using Withly.Infrastructure.Models.Email;
 using Withly.Infrastructure.Models.Email.Interfaces;
 
