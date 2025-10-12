@@ -1,4 +1,4 @@
-using Withly.Infrastructure.Auth;
+using Withly.Persistence.Entities;
 
 namespace Withly.Application.Auth.Interfaces;
 

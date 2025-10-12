@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Withly.Application.Auth.Dtos;
 using Withly.Application.Auth.Interfaces;
@@ -6,29 +7,30 @@ using Withly.Application.Common;
 using Withly.Application.Common.Interfaces;
 using Withly.Application.Emails.Templates;
 using Withly.Application.UserProfiles.Dtos;
-using Withly.Domain.Entities;
-using Withly.Domain.Repositories;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Domain.Exceptions;
 using Withly.Persistence;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Application.Services;
 
 public class UserService(
+    ILogger<UserService> logger,
     UserManager<ApplicationUser> userManager,
     IAuthTokenGenerator tokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
     IUnitOfWork unitOfWork,
+    AppDbContext appDbContext,
     IBackgroundEmailQueue emailQueue,
-    IUserProfileRepository userProfileRepository,
-    IRefreshTokenRepository refreshTokenRepository,
-    SignInManager<ApplicationUser> signInManager,
-    ILogger<UserService> logger)
+    SignInManager<ApplicationUser> signInManager)
 {
     public async Task<Result<AuthResultDto>> RegisterAsync(RegisterUserDto dto, CancellationToken ct)
     {
         if (await userManager.FindByEmailAsync(dto.Email) is not null)
+        {
             return Result<AuthResultDto>.Fail("Email is already registered.");
-        
+        }
+
         var user = new ApplicationUser { Email = dto.Email, UserName = dto.Email };
         var result = await userManager.CreateAsync(user, dto.Password);
 
@@ -38,16 +40,16 @@ public class UserService(
             return Result<AuthResultDto>.Fail($"Registration failed: {errors}");
         }
 
-        await userProfileRepository.AddAsync(new UserProfile
+        await appDbContext.UserProfiles.AddAsync(new UserProfile
         {
             Id = user.Id,
             AvatarUrl = "TheLastAirbender",
             DisplayName = dto.DisplayName,
         }, ct);
-        
-        var refreshToken = refreshTokenGenerator.Generate(user.Id); 
 
-        await refreshTokenRepository.AddAsync(refreshToken, ct);
+        var refreshToken = refreshTokenGenerator.Generate(user.Id);
+
+        await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
         await unitOfWork.SaveChangesAsync(ct);
 
         emailQueue.QueueEmail(new WelcomeEmail
@@ -55,13 +57,14 @@ public class UserService(
             To = user.Email,
             DisplayName = dto.DisplayName
         }, user.Id);
-        
+
         return Result<AuthResultDto>.Success(new AuthResultDto
         {
             AccessToken = tokenGenerator.Generate(user),
             RefreshToken = refreshToken.Token
         });
     }
+
     public async Task<Result<AuthResultDto>> LoginAsync(string email, string password, CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(email);
@@ -70,9 +73,9 @@ public class UserService(
         var result = await signInManager.CheckPasswordSignInAsync(user, password, false);
         if (!result.Succeeded) return Result<AuthResultDto>.Fail("Invalid credentials");
 
-        var refreshToken = refreshTokenGenerator.Generate(user.Id); 
+        var refreshToken = refreshTokenGenerator.Generate(user.Id);
 
-        await refreshTokenRepository.AddAsync(refreshToken, ct);
+        await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
         await unitOfWork.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
@@ -81,28 +84,39 @@ public class UserService(
             RefreshToken = refreshToken.Token
         });
     }
-    
+
     public async Task RequestPasswordResetAsync(string email, CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(email);
+
         if (user is null)
+        {
             return;
-        
-        var userProfile = await userProfileRepository.GetByIdAsync(user.Id, ct);
+        }
+
+        var userProfile = await appDbContext.UserProfiles
+            .AsNoTracking()
+            .Where(profile => profile.Id == user.Id)
+            .FirstAsync(ct);
+
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
-        var resetLink = $"https://withly.app/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
+
+        var resetLink =
+            $"https://withly.app/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email)}";
 
         emailQueue.QueueEmail(new PasswordResetEmail
         {
-            To = user.Email!,
-            Username = userProfile!.DisplayName,
+            To = user.Email,
+            Username = userProfile.DisplayName,
             ResetLink = resetLink
         }, user.Id);
     }
-    
-    public async Task<Result<AuthResultDto>> ResetPasswordAsync(string email, string token, string newPassword, CancellationToken ct)
+
+    public async Task<Result<AuthResultDto>> ResetPasswordAsync(string email, string token, string newPassword,
+        CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(email);
+
         if (user == null)
         {
             logger.LogWarning("User not found, probably forged request");
@@ -110,14 +124,17 @@ public class UserService(
         }
 
         var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+
         if (!result.Succeeded)
             return Result<AuthResultDto>.Fail(string.Join("; ", result.Errors.Select(e => e.Description)));
 
-        refreshTokenRepository.RemoveTokensForUser(user.Id);
-        
+
+        var tokens = appDbContext.RefreshTokens.Where(rft => rft.UserId == user.Id);
+        appDbContext.RefreshTokens.RemoveRange(tokens);
+
         var refreshToken = refreshTokenGenerator.Generate(user.Id);
 
-        await refreshTokenRepository.AddAsync(refreshToken, ct);
+        await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
         await unitOfWork.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
@@ -126,15 +143,34 @@ public class UserService(
             RefreshToken = refreshToken.Token
         });
     }
-    public async Task<UserProfileDto?> GetUserByIdAsync(Guid id, CancellationToken ct)
+
+    public async Task<UserProfileDto> GetUserByIdAsync(Guid id, CancellationToken ct)
     {
-        var profile = await userProfileRepository.GetByIdAsync(id, ct);
-        if (profile is null) return null;
+        var profile = await appDbContext.UserProfiles.AsNoTracking().Where(profile => profile.Id == id)
+            .FirstOrDefaultAsync(ct);
+
+        if (profile is null) throw EntityNotFoundException.For<UserProfile>(id.ToString());
 
         return new UserProfileDto(
             profile.Id,
             profile.DisplayName,
             profile.AvatarUrl
+        );
+    }
+
+    public async Task<UserProfileDto?> FindUserByEmailAsync(string email, CancellationToken ct)
+    {
+        var userWithProfile = await appDbContext.Users
+            .Where(user => user.Email == email)
+            .Include(x => x.Profile)
+            .FirstOrDefaultAsync(ct);
+
+        if (userWithProfile is null) return null;
+
+        return new UserProfileDto(
+            userWithProfile.Id,
+            userWithProfile.Profile.DisplayName,
+            userWithProfile.Profile.AvatarUrl
         );
     }
 }

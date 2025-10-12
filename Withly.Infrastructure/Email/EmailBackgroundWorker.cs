@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Withly.Infrastructure.Models.Email;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
@@ -27,7 +28,7 @@ public class EmailBackgroundWorker(
             {
                 await using var scope = serviceScopeFactory.CreateAsyncScope();
                 var razorRenderer = scope.ServiceProvider.GetRequiredService<IEmailTemplateRenderer>();
-                var emailMessageRepository = scope.ServiceProvider.GetRequiredService<EmailMessageRepository>();
+                var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                 string html;
                 try
@@ -43,7 +44,7 @@ public class EmailBackgroundWorker(
                 logger.LogInformation("Rendered {EmailType} email", email.TemplateName);
                 
                 var emailMessage = new EmailMessage(email, html);
-                await emailMessageRepository.EnqueueAsync(emailMessage, stoppingToken);
+                await appDbContext.EmailMessages.AddAsync(emailMessage, stoppingToken);
                 
                 logger.LogInformation("Enqueued {EmailType} email", email.TemplateName);
             }

@@ -1,4 +1,4 @@
-﻿using Withly.Domain.Entities;
+﻿using Withly.Persistence.Entities;
 
 namespace Withly.Application.Events;
 

@@ -3,13 +3,12 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Withly.Infrastructure.Models.Email;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
 public class SmtpEmailService(
-    IEmailTemplateRenderer renderer,
     IOptions<SmtpSettings> smtpSettingsOptions,
     ILogger<SmtpEmailService> logger) : IEmailService
 {

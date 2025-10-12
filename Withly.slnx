@@ -12,7 +12,6 @@
     <Project Path="Withly.AppHost\Withly.AppHost.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/Infrastructure/">
-    <Project Path="Withly.Infrastructure.Models/Withly.Infrastructure.Models.csproj" />
     <Project Path="Withly.Infrastructure/Withly.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Persistence/">

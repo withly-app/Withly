@@ -1,34 +1,41 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
 public class EmailDispatchWorker(
-    IServiceScopeFactory serviceScopeFactory,
-    ILogger<EmailDispatchWorker> logger) : BackgroundService
+    ILogger<EmailDispatchWorker> logger,
+    IServiceScopeFactory serviceScopeFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
+            await using var scope = serviceScopeFactory.CreateAsyncScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var smtp = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+            await using var transaction = await dbContext.Database.BeginTransactionAsync(stoppingToken);
             try
             {
-                await using var scope = serviceScopeFactory.CreateAsyncScope();
-                var repo = scope.ServiceProvider.GetRequiredService<EmailMessageRepository>();
-                var smtp = scope.ServiceProvider.GetRequiredService<IEmailService>();
-
-                var pending = await repo.GetPendingAsync(10, stoppingToken);
+                
+                var pending = dbContext.EmailMessages
+                    .Where(m => m.Status == EmailStatus.Queued && m.NextAttemptUtc <= DateTime.UtcNow)
+                    .OrderBy(m => m.CreatedUtc)
+                    .Take(10);
 
                 foreach (var msg in pending)
                 {
                     try
                     {
-                        await repo.MarkAsInProgressAsync(msg.Id, stoppingToken);
+                        msg.Status = EmailStatus.InProgress;
 
                         await smtp.SendAsync(msg, stoppingToken);
-                        await repo.MarkAsSentAsync(msg.Id, stoppingToken);
+                        msg.Status = EmailStatus.Completed;
 
                         logger.LogInformation("Sent email {Id} to {Recipients}", msg.Id, msg.Recipients);
                     }
@@ -36,18 +43,28 @@ public class EmailDispatchWorker(
                     {
                         var retryCount = msg.RetryCount;
                         logger.LogError(ex, "Failed to send email {Id}, retry count: {RetryCount}", msg.Id, retryCount);
+
                         if (msg.RetryCount < 4)
                         {
-                            await repo.IncrementRetryAnRequeueAsync(msg.Id, stoppingToken);
+                            msg.Status = EmailStatus.Queued;
+                            msg.RetryCount++;
+                            msg.NextAttemptUtc = DateTime.UtcNow.AddSeconds(5 * msg.RetryCount);
                             continue;
                         }
-                        await repo.MarkAsFailedAsync(msg.Id, stoppingToken);
+
+                        msg.Status = EmailStatus.Failed;
                     }
                 }
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync(stoppingToken);
                 logger.LogError(ex, "Error in EmailDispatchWorker loop");
+            }
+            finally
+            {
+                await dbContext.SaveChangesAsync(stoppingToken);
+                await transaction.CommitAsync(stoppingToken);
             }
 
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);

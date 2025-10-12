@@ -1,57 +1,34 @@
 using Serilog;
 using Withly.API.Extensions;
-using Withly.API.Middleware;
-using Withly.Application;
-using Withly.Infrastructure;
+using Withly.Application.DevAuth; // <-- new namespace with our extensions
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.AddSerilog(builder.Configuration);
+builder.Configuration.AddUserSecrets<Program>(optional: true);
 
-builder.Configuration.AddUserSecrets<Program>();
+builder.Services.AddWithlyApi(builder.Configuration);
 
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+if (builder.Environment.IsDevelopment())
 {
-    var basePath = AppContext.BaseDirectory;
-    var xmlFiles = Directory.GetFiles(basePath, "*.xml", SearchOption.TopDirectoryOnly);
-
-    foreach (var xmlFile in xmlFiles)
-    {
-        c.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);
-    }
-});
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddAppHealthChecks();
-builder.Services.AddControllers();
-
-
-builder.Services.AddJwtAuthentication(builder.Configuration);
-
-builder.Services.AddAuthorization();
-
-
-var app = builder.Build();
-        
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    builder.Services.Configure<DevAuthOptions>(builder.Configuration.GetSection("DevAuth"));
+    builder.Services.AddSingleton<DevTokenProvider>();
+    builder.Services.AddSingleton<IDevTokenProvider>(sp => sp.GetRequiredService<DevTokenProvider>());
+    builder.Services.AddHostedService<DevUserSeeder>();
 }
 
-app.UseHttpsRedirection();
+var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseWithlyApi();
 
-app.MapControllers();
-app.UseAppHealthChecks();
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/dev/token",
+            (IDevTokenProvider p) => string.IsNullOrWhiteSpace(p.Token)
+                ? Results.NotFound("Token not generated")
+                : Results.Text(p.Token, "text/plain"))
+        .AllowAnonymous();
+}
 
 try
 {

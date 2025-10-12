@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using Withly.Application.Auth.Interfaces;
+using Withly.Persistence.Entities;
 
 namespace Withly.Infrastructure.Auth;
 

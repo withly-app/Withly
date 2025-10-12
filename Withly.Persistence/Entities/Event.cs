@@ -1,23 +1,31 @@
-﻿namespace Withly.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using JetBrains.Annotations;
+
+namespace Withly.Persistence.Entities;
 
 public class Event
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     public DateTime CreatedUtc { get; private set; } = DateTime.UtcNow;
     public Guid OrganizerId { get; private set; }
-    public string Title { get; private set; }
-    public string Description { get; private set; }
+    [MaxLength(100)]
+    public string Title { get; private set; } = string.Empty;
+    [MaxLength(500)]
+    public string? Description { get; private set; }
     public DateTime StartUtc { get; private set; }
     public DateTime EndUtc { get; private set; }
     public bool IsRecurring { get; private set; }
+    [MaxLength(200)]
     public string? RecurringRule { get; private set; } // RFC 5545 format (null = one-time)
     public bool IsPublic { get; private set; }
+    [MaxLength(50)]
     public string? PublicJoinCode { get; private set; } // For public URLs
     public List<Invitee> Invitees { get; private set; } = [];
 
+    [UsedImplicitly]
     private Event() { } // For EF Core
 
-    public Event(Guid organizerId, string title, string description, DateTime startUtc, DateTime endUtc, bool isRecurring, string? recurringRule = null, bool isPublic = false)
+    public Event(Guid organizerId, string title, string? description, DateTime startUtc, DateTime endUtc, bool isRecurring, string? recurringRule = null, bool isPublic = false)
     {
         OrganizerId = organizerId;
         Title = title;

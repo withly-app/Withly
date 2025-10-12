@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Withly.Domain.Entities;
-using Withly.Infrastructure.Auth;
-using Withly.Infrastructure.Models.Email;
+using Withly.Persistence.Entities;
 
 namespace Withly.Persistence;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options)
+public class AppDbContext(
+    DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -20,12 +19,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<UserProfile>()
-            .HasOne<ApplicationUser>()
-            .WithOne()
+        modelBuilder.Entity<ApplicationUser>(b =>
+        {
+            b.Property(u => u.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            b.Property(u => u.NormalizedEmail)
+                .IsRequired()
+                .HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<UserProfile>(b =>
+        {
+            b.Property(up => up.AvatarUrl)
+                .HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<ApplicationUser>()
+            .HasOne<UserProfile>(user => user.Profile)
+            .WithOne(profile => profile.User)
             .HasForeignKey<UserProfile>(p => p.Id)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Invitees)
             .WithOne(i => i.Event)
@@ -33,15 +49,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<EmailMessage>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
+            .HasOne<ApplicationUser>(email => email.User)
+            .WithMany(user => user.Emails)
             .HasForeignKey(e => e.UserId);
-        
+
         modelBuilder.Entity<EmailMessage>()
             .HasMany(e => e.Attachments)
             .WithOne(a => a.Email)
             .HasForeignKey(a => a.EmailId)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 }

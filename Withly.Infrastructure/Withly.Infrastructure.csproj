@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Withly.Application\Withly.Application.csproj" />
-    <ProjectReference Include="..\Withly.Infrastructure.Models\Withly.Infrastructure.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MailKit" />

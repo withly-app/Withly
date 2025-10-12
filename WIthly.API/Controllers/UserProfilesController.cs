@@ -14,8 +14,6 @@ public class UserProfilesController(UserService userService) : Controller
     public async Task<IActionResult> GetById(Guid userId, CancellationToken ct = default)
     {
         var profile = await userService.GetUserByIdAsync(userId, ct);
-        if (profile is null) 
-            return NotFound();
         
         return Ok(profile);
     }
@@ -29,8 +27,6 @@ public class UserProfilesController(UserService userService) : Controller
             return Unauthorized();
 
         var profile = await userService.GetUserByIdAsync(userId, ct);
-        if (profile is null)
-            return NotFound();
 
         return Ok(profile);
     }

@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using Withly.Domain.Entities;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
+using Withly.Persistence.Entities;
 
 namespace Withly.Application.Events;
 
@@ -30,7 +30,10 @@ public static class IcsBuilder
         calendar.Events.Add(e);
 
         var serializer = new CalendarSerializer();
-        var serialized = serializer.SerializeToString(calendar);
+
+        var serialized = serializer.SerializeToString(calendar) ??
+                         throw new InvalidOperationException("Failed to serialize calendar.");
+
 
         return Encoding.UTF8.GetBytes(serialized);
     }

@@ -1,5 +1,6 @@
-﻿using Withly.Infrastructure.Models.Email;
-using Withly.Infrastructure.Models.Email.Interfaces;
+﻿
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Application.Emails.Templates;
 

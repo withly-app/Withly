@@ -3,7 +3,7 @@
 public record EventDetailsDto(
     Guid Id,
     string Title,
-    string Description,
+    string? Description,
     DateTime StartUtc,
     DateTime EndUtc,
     bool IsRecurring,

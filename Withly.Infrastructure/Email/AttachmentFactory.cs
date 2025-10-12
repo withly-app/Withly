@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using Withly.Domain.Entities;
-using Withly.Infrastructure.Models.Email;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 public class AttachmentFactory : IAttachmentFactory
@@ -35,7 +34,7 @@ public class AttachmentFactory : IAttachmentFactory
     ///   <item><description>Invalid file name characters are removed.</description></item>
     ///   <item><description>All characters are converted to lowercase using invariant culture.</description></item>
     ///   <item><description>The string is truncated to the specified maximum length.</description></item>
-    ///   <item><description>If the result would be empty, the fallback value <c>"unnamed"</c> is returned.</description></item>
+    ///   <item><description>If the result is empty, the fallback value <c>"unnamed"</c> is returned.</description></item>
     /// </list>
     /// </returns>
     private static string NormalizeFileName(string input, int maxLength = 100)

@@ -1,11 +1,11 @@
 ﻿using Withly.Application.Common.Interfaces;
 using Withly.Application.Events.Dtos;
-using Withly.Domain.Entities;
-using Withly.Domain.Repositories;
+using Withly.Persistence;
+using Withly.Persistence.Entities;
 
 namespace Withly.Application.Events;
 
-internal class EventCreator(IEventRepository eventRepository,
+internal class EventCreator(AppDbContext dbContext,
     ICurrentUserService currentUser,
     IUnitOfWork unitOfWork,
     IEventMailer eventMailer) : IEventCreator
@@ -31,7 +31,7 @@ internal class EventCreator(IEventRepository eventRepository,
                 @event.AddInvitee(email);
         }
 
-        await eventRepository.AddAsync(@event, ct);
+        await dbContext.Events.AddAsync(@event, ct);
         await unitOfWork.SaveChangesAsync(ct);
 
         if (!@event.IsPublic && request.InviteeEmails is { Count: > 0 })

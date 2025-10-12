@@ -1,0 +1,10 @@
+
+[*]
+
+# ReSharper properties
+resharper_arguments_literal = positional
+resharper_blank_lines_after_control_transfer_statements = 1
+resharper_braces_for_ifelse = required_for_multiline
+resharper_braces_redundant = false
+resharper_place_simple_embedded_statement_on_same_line = true
+resharper_wrap_primary_constructor_parameters_style = chop_always

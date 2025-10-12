@@ -1,6 +1,6 @@
 ﻿using Withly.Application.Emails.Templates;
-using Withly.Domain.Entities;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence.Entities;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Application.Events;
 

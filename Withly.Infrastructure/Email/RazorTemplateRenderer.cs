@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using RazorLight;
+﻿using RazorLight;
 using Withly.Application.Emails.Templates;
-using Withly.Infrastructure.Models.Email.Interfaces;
+using Withly.Persistence.Entities.Interfaces;
 
 namespace Withly.Infrastructure.Email;
 
-public class RazorTemplateRenderer(ILogger<RazorTemplateRenderer> logger) : IEmailTemplateRenderer
+public class RazorTemplateRenderer : IEmailTemplateRenderer
 {
     private readonly RazorLightEngine _engine = new RazorLightEngineBuilder()
         .UseEmbeddedResourcesProject(typeof(WelcomeEmail))
