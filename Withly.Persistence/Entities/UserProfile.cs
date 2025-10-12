@@ -6,7 +6,7 @@ public class UserProfile
 {
     [Key]
     public Guid Id { get; init; }
-    public ApplicationUser User { get; set; } = null!;
+    public ApplicationUser User { get; init; } = null!;
     [MaxLength(50)]
     public required string DisplayName { get; set; }
     
