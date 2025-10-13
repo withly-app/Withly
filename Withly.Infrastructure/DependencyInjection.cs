@@ -21,11 +21,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                npgsqlOptions =>
-                {
-                    npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(5), null);
-                    npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);
-                }));
+                npgsqlOptions => { npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name); }));
 
         services.AddIdentityCore<ApplicationUser>(options =>
             {

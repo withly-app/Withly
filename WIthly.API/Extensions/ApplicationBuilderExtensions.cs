@@ -53,6 +53,16 @@ public static class ApplicationBuilderExtensions
                              })();
                              """, "application/javascript")
             ).AllowAnonymous();
+            
+            app.Use(async (ctx, next) =>
+            {
+              try { await next(); }
+              catch (TaskCanceledException) when (ctx.Request.Path.StartsWithSegments("/swagger"))
+              {
+                // Client closed request; swallow to avoid 500 spam
+                // Optionally: ctx.Response.StatusCode = 499; // non-standard but descriptive
+              }
+            });
         }
 
         app.UseHttpsRedirection();

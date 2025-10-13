@@ -47,6 +47,7 @@ public class EmailBackgroundWorker(
                 await appDbContext.EmailMessages.AddAsync(emailMessage, stoppingToken);
                 
                 logger.LogInformation("Enqueued {EmailType} email", email.TemplateName);
+                await appDbContext.SaveChangesAsync(stoppingToken);
             }
             catch (Exception ex)
             {
