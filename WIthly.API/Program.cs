@@ -1,6 +1,6 @@
 using Serilog;
 using Withly.API.Extensions;
-using Withly.Application.DevAuth; // <-- new namespace with our extensions
+using Withly.Application.DevAuth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +9,7 @@ builder.Configuration.AddUserSecrets<Program>(optional: true);
 
 builder.Services.AddWithlyApi(builder.Configuration);
 
+#if DEBUG
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.Configure<DevAuthOptions>(builder.Configuration.GetSection("DevAuth"));
@@ -16,6 +17,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IDevTokenProvider>(sp => sp.GetRequiredService<DevTokenProvider>());
     builder.Services.AddHostedService<DevUserSeeder>();
 }
+#endif
 
 var app = builder.Build();
 

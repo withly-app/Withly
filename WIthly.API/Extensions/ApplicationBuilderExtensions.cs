@@ -10,6 +10,7 @@ public static class ApplicationBuilderExtensions
     {
         app.UseSerilogRequestLogging();
 
+        #if DEBUG
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -71,7 +72,8 @@ public static class ApplicationBuilderExtensions
                   : Results.Text(p.Token, "text/plain"))
               .AllowAnonymous();
         }
-
+        #endif
+        
         app.UseHttpsRedirection();
 
         app.UseMiddleware<ExceptionHandlerMiddleware>();
