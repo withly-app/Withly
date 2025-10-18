@@ -21,6 +21,7 @@ public class Event
     [MaxLength(50)]
     public string? PublicJoinCode { get; private set; } // For public URLs
     public List<Invitee> Invitees { get; private set; } = [];
+    public List<Rsvp> Rsvps { get; private set; } = [];
 
     [UsedImplicitly]
     private Event() { } // For EF Core
@@ -54,17 +55,15 @@ public class Event
         }
     }
 
-    public void AddInvitee(string email, string? name = null)
+    public void AddInvitee(Invitee invitee)
     {
         if (IsPublic)
             throw new InvalidOperationException("Cannot add invitees to public events.");
 
-        var normalizedMail = email.Trim().ToLowerInvariant();
-        
-        if (HasInvitee(normalizedMail))
+        if (HasInvitee(invitee.Email))
             return;
 
-        Invitees.Add(new Invitee(Id, normalizedMail, name));
+        Invitees.Add(invitee);
     }
     
     public bool HasInvitee(string email) =>

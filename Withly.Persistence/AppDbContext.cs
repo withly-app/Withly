@@ -45,8 +45,31 @@ public class AppDbContext(
 
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Invitees)
-            .WithOne(i => i.Event)
-            .HasForeignKey(i => i.EventId)
+            .WithMany(i => i.Events);
+
+        modelBuilder.Entity<Invitee>(b =>
+            {
+                b.Property(i => i.Email)
+                    .IsRequired();
+
+                b.HasIndex(i => i.Email)
+                    .IsUnique();
+            }
+        );
+        
+        modelBuilder.Entity<Invitee>()
+            .HasMany(i => i.Rsvps)
+            .WithOne(r => r.Invitee)
+            .HasForeignKey(r => r.InviteeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Rsvp>()
+            .HasKey(r => new { r.EventId, r.InviteeId });
+        
+        modelBuilder.Entity<Rsvp>()
+            .HasOne<Event>(e => e.Event)
+            .WithMany(ev => ev.Rsvps)
+            .HasForeignKey(r => r.EventId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<EmailMessage>()

@@ -19,6 +19,10 @@ internal class EventCreator(
         var organizer = await dbContext.UserProfiles
             .Include(u => u.User)
             .FirstAsync(u => u.Id == userId, ct);
+        
+        var invitees = await dbContext.Invitees
+            .Where(i => request.InviteeEmails.Contains(i.Email))
+            .ToListAsync(ct);
 
         var @event = new Event(
             organizerId: userId,
@@ -35,7 +39,13 @@ internal class EventCreator(
         {
             foreach (var email in request.InviteeEmails)
             {
-                @event.AddInvitee(email);
+                if (invitees.FirstOrDefault(i => i.Email.Equals(email, StringComparison.OrdinalIgnoreCase)) is { } existingInvitee)
+                {
+                    @event.AddInvitee(existingInvitee);
+                    continue;
+                }
+                
+                @event.AddInvitee(new Invitee(email));
             }
         }
 

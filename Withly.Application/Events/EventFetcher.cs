@@ -24,7 +24,7 @@ internal class EventFetcher(
                 e.IsPublic,
                 e.PublicJoinCode,
                 e.Invitees.Where(_ => e.IsPublic)
-                    .Select(i => new InviteeDto(i.Email, i.Name, i.RsvpStatus.ToString()))
+                    .Select(i => new InviteeDto(i.Email, i.Name, i.Rsvps.First(r => r.EventId == e.Id).Status.ToString()))
                     .ToList()
             ))
             .FirstOrDefaultAsync(ct);
