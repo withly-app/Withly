@@ -15,5 +15,7 @@
     <EmbeddedResource Include="Emails\Templates\Welcome.cshtml" />
     <None Remove="Emails\Templates\PasswordReset.cshtml" />
     <EmbeddedResource Include="Emails\Templates\PasswordReset.cshtml" />
+    <None Remove="Emails\Templates\EventInvite.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\EventInvite.cshtml" />
   </ItemGroup>
 </Project>

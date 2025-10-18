@@ -5,8 +5,7 @@ namespace Withly.Persistence.Entities;
 public class EmailAttachment
 {
     public Guid Id { get; set; }
-    public Guid EmailId { get; set; }
-    public EmailMessage Email { get; } = null!;
+    public List<EmailMessage> Emails { get; } = null!;
     
     [MaxLength(255)]
     public required string FileName { get; set; }

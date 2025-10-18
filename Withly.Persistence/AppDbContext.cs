@@ -14,6 +14,7 @@ public class AppDbContext(
     public DbSet<Event> Events => Set<Event>();
     public DbSet<Invitee> Invitees => Set<Invitee>();
     public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
+    public DbSet<EmailAttachment> EmailAttachments => Set<EmailAttachment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,8 +56,6 @@ public class AppDbContext(
 
         modelBuilder.Entity<EmailMessage>()
             .HasMany(e => e.Attachments)
-            .WithOne(a => a.Email)
-            .HasForeignKey(a => a.EmailId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithMany(a => a.Emails);
     }
 }

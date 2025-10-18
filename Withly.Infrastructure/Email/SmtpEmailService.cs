@@ -18,6 +18,7 @@ public class SmtpEmailService(
     {
         var message = new MimeMessage();
         message.From.Add(MailboxAddress.Parse("noreply@withly.app"));
+
         foreach (var recipient in emailModel.Recipients)
         {
             if (MailboxAddress.TryParse(recipient, out var mailboxAddress))
@@ -25,8 +26,29 @@ public class SmtpEmailService(
                 message.To.Add(mailboxAddress);
             }
         }
+
         message.Subject = emailModel.Subject;
         message.Body = new TextPart("html") { Text = emailModel.Body };
+
+        foreach (var attachment in emailModel.Attachments)
+        {
+            var mimePart = new MimePart(attachment.MimeType)
+            {
+                Content = new MimeContent(new MemoryStream(attachment.Content)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                FileName = attachment.FileName
+            };
+
+            if (message.Body is Multipart multipart)
+            {
+                multipart.Add(mimePart);
+            }
+            else
+            {
+                var newMultipart = new Multipart("mixed") { message.Body, mimePart };
+                message.Body = newMultipart;
+            }
+        }
 
         using var client = new SmtpClient();
         client.CheckCertificateRevocation = false;

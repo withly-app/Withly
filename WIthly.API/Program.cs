@@ -21,15 +21,6 @@ var app = builder.Build();
 
 app.UseWithlyApi();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapGet("/dev/token",
-            (IDevTokenProvider p) => string.IsNullOrWhiteSpace(p.Token)
-                ? Results.NotFound("Token not generated")
-                : Results.Text(p.Token, "text/plain"))
-        .AllowAnonymous();
-}
-
 try
 {
     app.Run();

@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Withly.API.Middleware;
+using Withly.Application.DevAuth;
 
 namespace Withly.API.Extensions;
 
@@ -63,6 +64,12 @@ public static class ApplicationBuilderExtensions
                 // Optionally: ctx.Response.StatusCode = 499; // non-standard but descriptive
               }
             });
+            
+            app.MapGet("/dev/token",
+                (IDevTokenProvider p) => string.IsNullOrWhiteSpace(p.Token)
+                  ? Results.NotFound("Token not generated")
+                  : Results.Text(p.Token, "text/plain"))
+              .AllowAnonymous();
         }
 
         app.UseHttpsRedirection();

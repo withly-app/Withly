@@ -4,5 +4,5 @@ namespace Withly.Application.Events;
 
 public interface IEventMailer
 {
-    void SendEventInvite(Event @event);
+    void SendEventInvite(Event @event, UserProfile organizer);
 }

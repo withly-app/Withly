@@ -29,7 +29,7 @@ public class CreateEventDto
     /// <summary>
     /// Indicates whether the event repeats.
     /// </summary>
-    /// <example>false</example>
+    /// <example>true</example>
     public bool IsRecurring { get; init; }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class CreateEventDto
     /// List of invitee email addresses. Only valid for private events.
     /// </summary>
     /// <example>
-    /// [ "alice@example.com", "bob@example.org" ]
+    /// [ "steve@example.org", "bob@example.org" ]
     /// </example>
     public List<string> InviteeEmails { get; init; } = [];
 }

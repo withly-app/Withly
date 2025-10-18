@@ -33,6 +33,7 @@ public class EmailMessage
         Recipients = [template.To];
         Subject = template.Subject;
         Body = body;
+        Attachments = template.Attachments;
     }
 }
 

@@ -22,36 +22,50 @@ public class EmailBackgroundWorker(
             return;
         }
 
-        await foreach (var email in reader.ReadAllAsync(stoppingToken))
+        await foreach (var emailBatch in reader.ReadAllAsync(stoppingToken))
         {
+            await using var scope = serviceScopeFactory.CreateAsyncScope();
+
             try
             {
-                await using var scope = serviceScopeFactory.CreateAsyncScope();
-                var razorRenderer = scope.ServiceProvider.GetRequiredService<IEmailTemplateRenderer>();
                 var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                string html;
-                try
+                foreach (var email in emailBatch)
                 {
-                    html = await razorRenderer.RenderAsync(email);
+                    try
+                    {
+                        var razorRenderer = scope.ServiceProvider.GetRequiredService<IEmailTemplateRenderer>();
+
+                        string html;
+
+                        try
+                        {
+                            html = await razorRenderer.RenderAsync(email);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Error rendering email");
+                            continue;
+                        }
+
+                        logger.LogInformation("Rendered {EmailType} email", email.TemplateName);
+
+                        var emailMessage = new EmailMessage(email, html);
+                        await appDbContext.EmailMessages.AddAsync(emailMessage, stoppingToken);
+
+                        logger.LogInformation("Enqueued {EmailType} email", email.TemplateName);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Error sending email");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Error rendering email");
-                    continue;
-                }
-                
-                logger.LogInformation("Rendered {EmailType} email", email.TemplateName);
-                
-                var emailMessage = new EmailMessage(email, html);
-                await appDbContext.EmailMessages.AddAsync(emailMessage, stoppingToken);
-                
-                logger.LogInformation("Enqueued {EmailType} email", email.TemplateName);
+
                 await appDbContext.SaveChangesAsync(stoppingToken);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error sending email");
+                logger.LogError(ex, "Error processing email batch");
             }
         }
     }

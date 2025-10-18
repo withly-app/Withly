@@ -14,6 +14,6 @@ public class EventInviteEmail : IEmailTemplate
     public required string EventTitle { get; init; }
     public required DateTime StartUtc { get; init; }
     public required Guid EventId { get; init; }
-    public static string RsvpBaseUrl => "https://withly.app/rsvp";
+    public string RsvpBaseUrl => "https://withly.app/rsvp";
     public string TemplateName => "EventInvite";
 }

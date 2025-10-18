@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Withly.Persistence;
@@ -26,6 +27,7 @@ public class EmailDispatchWorker(
                 var pending = dbContext.EmailMessages
                     .Where(m => m.Status == EmailStatus.Queued && m.NextAttemptUtc <= DateTime.UtcNow)
                     .OrderBy(m => m.CreatedUtc)
+                    .Include(m => m.Attachments)
                     .Take(10);
 
                 foreach (var msg in pending)

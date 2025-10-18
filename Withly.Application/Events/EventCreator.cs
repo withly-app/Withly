@@ -1,11 +1,13 @@
-﻿using Withly.Application.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Withly.Application.Common.Interfaces;
 using Withly.Application.Events.Dtos;
 using Withly.Persistence;
 using Withly.Persistence.Entities;
 
 namespace Withly.Application.Events;
 
-internal class EventCreator(AppDbContext dbContext,
+internal class EventCreator(
+    AppDbContext dbContext,
     ICurrentUserService currentUser,
     IUnitOfWork unitOfWork,
     IEventMailer eventMailer) : IEventCreator
@@ -13,6 +15,10 @@ internal class EventCreator(AppDbContext dbContext,
     public async Task<Guid> CreateEventAsync(CreateEventDto request, CancellationToken ct)
     {
         var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
+
+        var organizer = await dbContext.UserProfiles
+            .Include(u => u.User)
+            .FirstAsync(u => u.Id == userId, ct);
 
         var @event = new Event(
             organizerId: userId,
@@ -28,7 +34,9 @@ internal class EventCreator(AppDbContext dbContext,
         if (!@event.IsPublic && request.InviteeEmails is { Count: > 0 })
         {
             foreach (var email in request.InviteeEmails)
+            {
                 @event.AddInvitee(email);
+            }
         }
 
         await dbContext.Events.AddAsync(@event, ct);
@@ -36,9 +44,9 @@ internal class EventCreator(AppDbContext dbContext,
 
         if (!@event.IsPublic && request.InviteeEmails is { Count: > 0 })
         {
-            eventMailer.SendEventInvite(@event);
+            eventMailer.SendEventInvite(@event, organizer);
         }
-        
+
         return @event.Id;
     }
 }
