@@ -21,21 +21,23 @@ public class AppDbContext(
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ApplicationUser>(b =>
-        {
-            b.Property(u => u.Email)
-                .IsRequired()
-                .HasMaxLength(256);
+            {
+                b.Property(u => u.Email)
+                    .IsRequired()
+                    .HasMaxLength(256);
 
-            b.Property(u => u.NormalizedEmail)
-                .IsRequired()
-                .HasMaxLength(256);
-        });
+                b.Property(u => u.NormalizedEmail)
+                    .IsRequired()
+                    .HasMaxLength(256);
+            }
+        );
 
         modelBuilder.Entity<UserProfile>(b =>
-        {
-            b.Property(up => up.AvatarUrl)
-                .HasMaxLength(500);
-        });
+            {
+                b.Property(up => up.AvatarUrl)
+                    .HasMaxLength(500);
+            }
+        );
 
         modelBuilder.Entity<ApplicationUser>()
             .HasOne<UserProfile>(user => user.Profile)
@@ -43,34 +45,43 @@ public class AppDbContext(
             .HasForeignKey<UserProfile>(p => p.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Event>()
-            .HasMany(e => e.Invitees)
-            .WithMany(i => i.Events);
-
         modelBuilder.Entity<Invitee>(b =>
             {
-                b.Property(i => i.Email)
-                    .IsRequired();
-
-                b.HasIndex(i => i.Email)
-                    .IsUnique();
+                b.HasKey(i => i.Id);
+                b.Property(i => i.Email).IsRequired().HasMaxLength(256);
+                b.HasIndex(i => i.Email).IsUnique();
+                b.Property(i => i.Name).HasMaxLength(100);
             }
         );
-        
-        modelBuilder.Entity<Invitee>()
-            .HasMany(i => i.Rsvps)
-            .WithOne(r => r.Invitee)
-            .HasForeignKey(r => r.InviteeId)
-            .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Rsvp>()
-            .HasKey(r => new { r.EventId, r.InviteeId });
-        
-        modelBuilder.Entity<Rsvp>()
-            .HasOne<Event>(e => e.Event)
-            .WithMany(ev => ev.Rsvps)
-            .HasForeignKey(r => r.EventId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Event>(b =>
+            {
+                b.HasKey(e => e.Id);
+                b.Property(e => e.Title).IsRequired().HasMaxLength(100);
+                b.Property(e => e.Description).HasMaxLength(500);
+                b.Property(e => e.RecurringRule).HasMaxLength(200);
+                b.Property(e => e.PublicJoinCode).HasMaxLength(50);
+
+                b.HasMany(e => e.Invitees)
+                    .WithMany(i => i.Events)
+                    .UsingEntity<Rsvp>(
+                        r => r.HasOne(x => x.Invitee)
+                            .WithMany(i => i.Rsvps)
+                            .HasForeignKey(x => x.InviteeId)
+                            .OnDelete(DeleteBehavior.Cascade),
+                        r => r.HasOne(x => x.Event)
+                            .WithMany(e => e.Rsvps)
+                            .HasForeignKey(x => x.EventId)
+                            .OnDelete(DeleteBehavior.Cascade),
+                        r =>
+                        {
+                            r.HasKey(x => new { x.EventId, x.InviteeId });
+                            r.Property(x => x.Secret).IsRequired().HasMaxLength(256);
+                            r.Property(x => x.Status).IsRequired();
+                        }
+                    );
+            }
+        );
 
         modelBuilder.Entity<EmailMessage>()
             .HasOne<ApplicationUser>(email => email.User)
