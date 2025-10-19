@@ -10,7 +10,6 @@ namespace Withly.Application.Services;
 
 public class RefreshTokenService(
     UserManager<ApplicationUser> userManager,
-    IUnitOfWork unitOfWork,
     IAuthTokenGenerator authTokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
     AppDbContext dbContext)
@@ -36,7 +35,7 @@ public class RefreshTokenService(
         var newRefreshToken = refreshTokenGenerator.Generate(user.Id);
 
         await dbContext.RefreshTokens.AddAsync(newRefreshToken, ct);
-        await unitOfWork.SaveChangesAsync(ct);
+        await dbContext.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
         {

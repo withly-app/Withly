@@ -9,7 +9,6 @@ namespace Withly.Application.Events;
 internal class EventCreator(
     AppDbContext dbContext,
     ICurrentUserService currentUser,
-    IUnitOfWork unitOfWork,
     IEventMailer eventMailer) : IEventCreator
 {
     public async Task<Guid> CreateEventAsync(CreateEventDto request, CancellationToken ct)
@@ -24,6 +23,7 @@ internal class EventCreator(
             .Where(i => request.InviteeEmails.Contains(i.Email))
             .ToListAsync(ct);
 
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(ct);
         var @event = new Event(
             organizerId: userId,
             title: request.Title,
@@ -34,8 +34,10 @@ internal class EventCreator(
             recurringRule: request.RecurringRule,
             isPublic: request.IsPublic
         );
+        
+        var privateEventHasInvitees = !@event.IsPublic && request.InviteeEmails is { Count: > 0 };
 
-        if (!@event.IsPublic && request.InviteeEmails is { Count: > 0 })
+        if (privateEventHasInvitees)
         {
             foreach (var email in request.InviteeEmails)
             {
@@ -49,10 +51,14 @@ internal class EventCreator(
             }
         }
 
+        
         await dbContext.Events.AddAsync(@event, ct);
-        await unitOfWork.SaveChangesAsync(ct);
 
-        if (!@event.IsPublic && request.InviteeEmails is { Count: > 0 })
+        await dbContext.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        
+
+        if (privateEventHasInvitees)
         {
             eventMailer.SendEventInvite(@event, organizer);
         }

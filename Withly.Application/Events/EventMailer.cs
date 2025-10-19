@@ -30,12 +30,19 @@ internal class EventMailer(
             EventTitle = @event.Title,
             StartUtc = @event.StartUtc,
             To = invitee.Email,
-            Attachments = [attachment]
+            Attachments =
+            [
+                attachment
+            ],
+            InviteeId = invitee.Id,
+            RsvpSecret = invitee.Rsvps.First(e => e.EventId == @event.Id).Secret
         };
     }
 
     private static EventInviteEmail BuildInvite(Event @event, UserProfile organizer, EmailAttachment attachment)
     {
+        // Organizer also gets an invitation; this should, however, be changed to not include RSVP links
+        // TODO: Implement organizer invite without RSVP links
         return new EventInviteEmail
         {
             DisplayName = organizer.DisplayName,
@@ -43,7 +50,12 @@ internal class EventMailer(
             EventTitle = @event.Title,
             StartUtc = @event.StartUtc,
             To = organizer.User.Email,
-            Attachments = [attachment]
+            Attachments =
+            [
+                attachment
+            ],
+            InviteeId = Guid.Empty,
+            RsvpSecret = ""
         };
     }
 }

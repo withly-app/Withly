@@ -19,12 +19,19 @@ public class EventsController(IEventFetcher eventFetcher, IEventCreator eventCre
 
         return Ok(result);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Create(CreateEventDto dto, CancellationToken ct = default)
     {
-        var id = await eventCreator.CreateEventAsync(dto, ct);
-        return CreatedAtAction(nameof(GetById), new { id }, id);
+        try
+        {
+            var id = await eventCreator.CreateEventAsync(dto, ct);
+            return CreatedAtAction(nameof(GetById), new { id }, id);
+        }
+        catch (Exception)
+        {
+            return Problem("An error occurred while creating the event.");
+        }
     }
 
 }

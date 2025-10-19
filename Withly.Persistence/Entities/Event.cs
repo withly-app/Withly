@@ -62,7 +62,7 @@ public class Event
 
         if (HasInvitee(invitee.Email))
             return;
-
+        
         Invitees.Add(invitee);
     }
     

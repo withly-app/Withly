@@ -20,8 +20,14 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                npgsqlOptions => { npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name); }));
+            {
+                options.UseNpgsql(
+                    configuration.GetConnectionString("DefaultConnection"),
+                    npgsqlOptions => { npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name); }
+                );
+                options.EnableSensitiveDataLogging();
+            }
+        );
 
         services.AddIdentityCore<ApplicationUser>(options =>
             {
@@ -36,7 +42,6 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthTokenGenerator, JwtAuthTokenGenerator>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         services.AddScoped<IAttachmentFactory, AttachmentFactory>();

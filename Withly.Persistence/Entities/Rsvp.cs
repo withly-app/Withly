@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Withly.Domain;
 using Withly.Domain.Enums;
 
 namespace Withly.Persistence.Entities;
@@ -13,5 +14,16 @@ public class Rsvp
     public DateTime RespondedAtUtc { get; private set; } = DateTime.UtcNow;
     
     [MaxLength(256)]
-    public string Secret { get; private set; } = string.Empty;
+    public string Secret { get; private set; } = SecretGenerator.GenerateSecret();
+    
+    private Rsvp()
+    {
+        
+    }
+    
+    public void UpdateStatus(RsvpStatus status)
+    {
+        Status = status;
+        RespondedAtUtc = DateTime.UtcNow;
+    }
 }

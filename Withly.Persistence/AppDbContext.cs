@@ -13,6 +13,7 @@ public class AppDbContext(
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<Event> Events => Set<Event>();
     public DbSet<Invitee> Invitees => Set<Invitee>();
+    public DbSet<Rsvp> Rsvps => Set<Rsvp>();
     public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
     public DbSet<EmailAttachment> EmailAttachments => Set<EmailAttachment>();
 

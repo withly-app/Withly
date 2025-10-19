@@ -1,5 +1,8 @@
-﻿@model Withly.Application.Emails.Templates.EventInviteEmail
-
+﻿@using Withly.Domain.Enums
+@model Withly.Application.Emails.Templates.EventInviteEmail
+@{
+    var baseUrl = $"{Model.RsvpBaseUrl}?eventId={Model.EventId}&inviteeId={Model.InviteeId}&secret={Model.RsvpSecret}&response=";
+}
 <p>Hi @Model.DisplayName,</p>
 
 <p>
@@ -9,19 +12,17 @@
 
 <p>Please RSVP:</p>
 <ul>
-    <li>
-        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=yes")">
-            Yes
-        </a>
-    </li>
-    <li>
-        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=maybe")">
-            Maybe
-        </a>
-    </li>
-    <li>
-        <a href="@($"{Model.RsvpBaseUrl}?event={Model.EventId}&email={Model.To}&response=no")">
-            No
-        </a>
-    </li>
+    @foreach (var option in Enum.GetValues<RsvpStatus>())
+    {
+        if (option == RsvpStatus.NoResponse)
+        {
+            continue;
+        }
+        
+        <li>
+            <a href="@($"{baseUrl}{option.ToString()}")">
+                @option.ToString()
+            </a>
+        </li>
+    }
 </ul>

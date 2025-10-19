@@ -19,7 +19,6 @@ public class UserService(
     UserManager<ApplicationUser> userManager,
     IAuthTokenGenerator tokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
-    IUnitOfWork unitOfWork,
     AppDbContext appDbContext,
     IBackgroundEmailQueue emailQueue,
     SignInManager<ApplicationUser> signInManager)
@@ -50,7 +49,7 @@ public class UserService(
         var refreshToken = refreshTokenGenerator.Generate(user.Id);
 
         await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
-        await unitOfWork.SaveChangesAsync(ct);
+        await appDbContext.SaveChangesAsync(ct);
 
         emailQueue.QueueEmail(new WelcomeEmail
         {
@@ -76,7 +75,7 @@ public class UserService(
         var refreshToken = refreshTokenGenerator.Generate(user.Id);
 
         await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
-        await unitOfWork.SaveChangesAsync(ct);
+        await appDbContext.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
         {
@@ -135,7 +134,7 @@ public class UserService(
         var refreshToken = refreshTokenGenerator.Generate(user.Id);
 
         await appDbContext.RefreshTokens.AddAsync(refreshToken, ct);
-        await unitOfWork.SaveChangesAsync(ct);
+        await appDbContext.SaveChangesAsync(ct);
 
         return Result<AuthResultDto>.Success(new AuthResultDto
         {

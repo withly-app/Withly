@@ -40,7 +40,7 @@ public class CreateEventDto
     public string? RecurringRule { get; init; }
 
     /// <summary>
-    /// Whether the event is public. Public events can be joined by a link.
+    /// Whether the event is public. Public events can be joined using a link.
     /// </summary>
     /// <example>false</example>
     public bool IsPublic { get; init; }
@@ -49,7 +49,7 @@ public class CreateEventDto
     /// List of invitee email addresses. Only valid for private events.
     /// </summary>
     /// <example>
-    /// [ "steve@example.org", "bob@example.org" ]
+    /// [ "oscar.vugt@gmail.com", "bob@example.org" ]
     /// </example>
     public List<string> InviteeEmails { get; init; } = [];
 }
