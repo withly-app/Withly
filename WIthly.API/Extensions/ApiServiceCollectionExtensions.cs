@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Withly.Application;
 using Withly.Infrastructure;
 
@@ -26,7 +26,8 @@ public static class ApiServiceCollectionExtensions
                 Scheme = "Bearer"
             });
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            // TODO: reimplement
+            /*c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
@@ -42,7 +43,7 @@ public static class ApiServiceCollectionExtensions
                     },
                     Array.Empty<string>()
                 }
-            });
+            });*/
         });
 
         services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
