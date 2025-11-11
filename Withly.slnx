@@ -1,20 +1,24 @@
 <Solution>
-  <Folder Name="/API/">
-    <Project Path="Withly.API/Withly.API.csproj" />
-  </Folder>
-  <Folder Name="/Application/">
-    <Project Path="Withly.Application/Withly.Application.csproj" />
-  </Folder>
-  <Folder Name="/Domain/">
-    <Project Path="Withly.Domain/Withly.Domain.csproj" />
-  </Folder>
-  <Folder Name="/Hosts/">
-    <Project Path="Withly.AppHost\Withly.AppHost.csproj" Type="Classic C#" />
-  </Folder>
-  <Folder Name="/Infrastructure/">
-    <Project Path="Withly.Infrastructure/Withly.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/Persistence/">
-    <Project Path="Withly.Persistence/Withly.Persistence.csproj" />
-  </Folder>
+    <Folder Name="/0. Solution Items/">
+      <File Path="Directory.Build.props"/>
+      <File Path="Directory.Packages.props"/>
+    </Folder>
+    <Folder Name="/1. Domain/">
+        <Project Path="Withly.Domain/Withly.Domain.csproj"/>
+    </Folder>
+    <Folder Name="/2. Persistence/">
+        <Project Path="Withly.Persistence/Withly.Persistence.csproj"/>
+    </Folder>
+    <Folder Name="/3. Application/">
+        <Project Path="Withly.Application/Withly.Application.csproj"/>
+    </Folder>
+    <Folder Name="/4. Infrastructure/">
+        <Project Path="Withly.Infrastructure/Withly.Infrastructure.csproj"/>
+    </Folder>
+    <Folder Name="/5. API/">
+        <Project Path="Withly.API/Withly.API.csproj"/>
+    </Folder>
+    <Folder Name="/6. Hosts/">
+        <Project Path="Withly.AppHost\Withly.AppHost.csproj" Type="Classic C#"/>
+    </Folder>
 </Solution>
