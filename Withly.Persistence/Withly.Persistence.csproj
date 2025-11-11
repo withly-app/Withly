@@ -2,7 +2,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" OverrideVersion="9.0.4"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" OverrideVersion="10.0.0-rc.2.25502.107"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Withly.Domain\Withly.Domain.csproj" />
