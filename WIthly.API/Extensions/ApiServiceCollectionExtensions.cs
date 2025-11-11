@@ -9,42 +9,35 @@ public static class ApiServiceCollectionExtensions
     public static IServiceCollection AddWithlyApi(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddEndpointsApiExplorer();
+
         services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Withly API", Version = "v1" });
-
-            var basePath = AppContext.BaseDirectory;
-            foreach (var xmlFile in Directory.GetFiles(basePath, "*.xml", SearchOption.TopDirectoryOnly))
-                c.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);
-
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer"
-            });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Withly API", Version = "v1" });
 
-            // TODO: reimplement
-            /*c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
+                var basePath = AppContext.BaseDirectory;
+
+                foreach (var xmlFile in Directory.GetFiles(basePath, "*.xml", SearchOption.TopDirectoryOnly))
+                    c.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);
+
+                c.AddSecurityDefinition(
+                    "Bearer",
                     new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        },
-                        Scheme = "oauth2",
-                        Name = "Bearer",
-                        In = ParameterLocation.Header
-                    },
-                    Array.Empty<string>()
-                }
-            });*/
-        });
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "Bearer"
+                    }
+                );
+
+                c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecuritySchemeReference("Bearer", doc)] = []
+                    }
+                );
+            }
+        );
 
         services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
 
